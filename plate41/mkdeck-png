@@ -1,7 +1,0 @@
-#!/bin/sh
-case $0 in
-	*mkdeck)
-		decksh countries-pop.dsh | pdf -pagesize $portrait -sans PublicSans-Bold $* ;;
-	*mkdeck-png)
-		decksh countries-pop.dsh | pngdeck -pagesize $portrait -sans PublicSans-Bold $* /dev/stdin ;;
-esac

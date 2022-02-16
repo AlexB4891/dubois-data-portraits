@@ -1,7 +1,0 @@
-#!/bin/sh
-case $0 in
-	*mkdeck)
-		decksh georgia-negro.dsh | pdf     -pagesize $portrait -mono Inconsolata-Light -sans $duboisans -serif $duboiserif $* ;;
-	*mkdeck-png)
-		decksh georgia-negro.dsh | pngdeck -pagesize $portrait -mono Inconsolata-Light -sans $duboisans -serif $duboiserif $* /dev/stdin ;;
-esac

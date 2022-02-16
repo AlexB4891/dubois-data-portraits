@@ -1,7 +1,0 @@
-#!/bin/sh
-case $0 in
-	*mkdeck)
-		decksh household.dsh | pdf -pagesize $portrait     -mono Inconsolata-Regular -sans PublicSans-Regular -serif PublicSans-Bold $* ;;
-	*mkdeck-png)
-		decksh household.dsh | pngdeck -pagesize $portrait -mono Inconsolata-Regular -sans PublicSans-Regular -serif PublicSans-Bold $* /dev/stdin ;;
-esac

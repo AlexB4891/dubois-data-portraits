@@ -1,7 +1,0 @@
-#!/bin/sh
-case $0 in
-	*mkdeck)
-		decksh color.dsh | pdf -pagesize $portrait -sans PublicSans-Bold -serif PublicSans-Medium  $* ;;
-	*mkdeck-png)
-		decksh color.dsh | pngdeck -pagesize $portrait -sans PublicSans-Bold -serif PublicSans-Medium  $* /dev/stdin ;;
-esac

@@ -1,7 +1,0 @@
-#!/bin/sh
-case $0 in
-	*mkdeck)
-		decksh mortality.dsh | pdf -pagesize $portrait $* ;;
-	*mkdeck-png)
-		decksh mortality.dsh | pngdeck -pagesize $portrait $* /dev/stdin ;;
-esac

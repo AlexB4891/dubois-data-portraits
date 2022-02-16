@@ -1,8 +1,0 @@
-#!/bin/sh
-case $0 in
-	*mkdeck)
-		decksh tenant.dsh | pdf -pagesize $landscape -sans PublicSans-Regular $* ;;
-	*mkdeck-png)
-		decksh tenant.dsh | pngdeck -pagesize $landscape -sans PublicSans-Regular $* /dev/stdin ;;
-esac
-

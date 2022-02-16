@@ -1,7 +1,0 @@
-#!/bin/sh
-case $0 in
-	*mkdeck)
-		decksh conjugal.dsh | pdf -pagesize $portrait -sans PublicSans-Bold -serif Charter-Regular $* ;;
-	*mkdeck-png)
-		decksh conjugal.dsh | pngdeck -pagesize $portrait -sans PublicSans-Bold -serif Charter-Regular $* /dev/stdin ;;
-esac

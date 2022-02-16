@@ -1,7 +1,0 @@
-#!/bin/sh
-case $0 in
-	*mkdeck)
-		decksh population-proportion.dsh | pdf -pagesize $portrait -sans PublicSans-Bold $* ;;
-	*mkdeck-png)
-		decksh population-proportion.dsh | pngdeck -pagesize $portrait -sans PublicSans-Bold $* /dev/stdin ;;
-esac

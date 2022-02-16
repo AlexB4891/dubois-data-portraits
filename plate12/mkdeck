@@ -1,7 +1,0 @@
-#!/bin/sh
-case $0 in
-	*mkdeck)
-		go run slavefree.go | pdf -pagesize $portrait -sans PublicSans-Bold $* ;;
-	*mkdeck-png)
-		go run slavefree.go | pngdeck -pagesize $portrait -sans PublicSans-Bold $* /dev/stdin ;;
-esac

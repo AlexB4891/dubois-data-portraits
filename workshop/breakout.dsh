@@ -1,5 +1,0 @@
-
-slide bgcolor fgcolor
-	ctext "Breakout and Discussion" sx sy ss
-	image "images/chat.png" 50 40 400 400
-eslide

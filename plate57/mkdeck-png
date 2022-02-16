@@ -1,9 +1,0 @@
-#!/bin/sh
-case $0 in
-	*mkdeck)
-		decksh business.dsh | pdf -pagesize $portrait -sans PublicSans-Regular $*
-		;;
-	*mkdeck-png)
-		decksh business.dsh | pngdeck -pagesize $portrait -sans PublicSans-Regular $* /dev/stdin
-		;;
-esac

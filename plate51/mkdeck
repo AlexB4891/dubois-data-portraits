@@ -1,7 +1,0 @@
-#!/bin/sh
-case $0 in
-	*mkdeck)
-		decksh free-slave.dsh | pdf -pagesize $portrait -sans PublicSans-Bold $* ;;
-	*mkdeck-png)
-		decksh free-slave.dsh | pngdeck -pagesize $portrait -sans PublicSans-Bold $* /dev/stdin ;;
-esac
