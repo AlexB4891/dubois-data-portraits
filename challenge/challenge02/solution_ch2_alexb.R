@@ -40,7 +40,8 @@ data_db <- read_csv("challenge/challenge02/data.csv")
 # font_import()
 # loadfonts(device = "win")
 font_add_google(name = "Space Mono", family = "space")
-font_add_google(name = "Cormorant Garamond", family = "corgar")
+font_add_google(name = "Almendra Display", family = "almendra")
+
 showtext_auto()
 
 
@@ -62,6 +63,15 @@ data_aux <- data_db %>%
   unique %>% 
   mutate(value = NA)
 
+data_text <- data_db %>% 
+  filter(value > 10) %>% 
+  group_by(Population,Age) %>% 
+  arrange(Age,Population) %>% 
+  mutate(cumsum = cumsum(value),
+         cumsum_l = replace_na(lag(cumsum),0),
+         position = (cumsum + cumsum_l)/2,
+         value = percent(value/100))
+
 plot_challenge_2 <-
  
   ggplot() + 
@@ -72,6 +82,7 @@ plot_challenge_2 <-
                group = Age),
            width = 0.5,
            position = "stack",show.legend = F) + 
+  geom_text(data = data_text,aes(x = Population,y = position,label = value))+
   # geom_brace(aes(y=c(0,1), x=c(0,1),group = c), inherit.data=F, rotate=90) +
   facet_grid(vars(Age),switch = "y",scales = "free", space = "free")+
   scale_fill_manual(values = c(SINGLE = unname(palette["red"]), 
@@ -86,14 +97,14 @@ plot_challenge_2 <-
        x = "",
        y = "") +
   coord_flip()   +
-  guides(fill = guide_legend(override.aes=list(shape = 21,size = 10),
+  guides(fill = guide_legend(override.aes=list(shape = 21,size = 12),
                              ncol=2,title.hjust = 0.5)) +
   theme_minimal()  +
   
   theme(
     # panel.border  = element_rect(colour = NA), 
-    text = element_text(family = "sans"),
-    axis.text.y = element_text(margin = margin(r = -280),vjust = -0.7,size = 12),
+    text = element_text(family = "space"),
+    axis.text.y = element_text(margin = margin(r = -280),size = 12),
     axis.text.x = element_blank(),
     panel.grid.major = element_blank(),
     panel.grid.minor =  element_blank(),
@@ -103,11 +114,13 @@ plot_challenge_2 <-
     plot.title = element_text(family = "space",face = "bold",
                               hjust = 0.25, size = 20, 
                               margin=margin(5,0,0,0)),
-    plot.margin = margin(t = 1, r = 4, b = 3, l = 6, "cm"),
+    plot.margin = margin(t = 1, r = 4, b = 3, l = 8, "cm"),
     legend.background = element_rect(fill = palette["paper"],color = palette["paper"]),
-    legend.key  = element_rect(fill = palette["paper"],color = palette["paper"]),
+    legend.key  = element_rect(margin = margin(r = 150, unit = "pt"),
+                               fill = palette["paper"],color = palette["paper"]),
     legend.position = "top",
     legend.direction = "vertical",
+    legend.text = element_text(margin = margin(r = 150, unit = "pt"),hjust = 1,size = 12),
     strip.background = element_rect(fill = palette["paper"],colour = palette["paper"]),
     strip.text.y.left = element_text(angle = 0,margin = margin(r = 150,l = 100),size = 14)
   )
@@ -117,9 +130,9 @@ plot_challenge_2 <-
 # Anotations --------------------------------------------------------------
 
 plot_challenge_2 <- ggdraw(plot = plot_challenge_2) +
-  draw_text(text = "{",x = 0.19,y = 0.21,size = 140,family = "corgar") +
-  draw_text(text = "{",x = 0.19,y = 0.48,size = 140,family = "corgar") +
-  draw_text(text = "{",x = 0.19,y = 0.75,size = 140,family = "corgar")
+  draw_text(text = "{",x = 0.23,y = 0.24,size = 140,family = "almendra") +
+  draw_text(text = "{",x = 0.23,y = 0.51,size = 140,family = "almendra") +
+  draw_text(text = "{",x = 0.23,y = 0.78,size = 140,family = "almendra")
 
 
   # Printing the plot: ------------------------------------------------------
