@@ -98,7 +98,8 @@ plot_challenge_2 <-
        y = "") +
   coord_flip()   +
   guides(fill = guide_legend(override.aes=list(shape = 21,size = 12),
-                             ncol=2,title.hjust = 0.5)) +
+                             ncol=2,
+                             title.hjust = 0.5)) +
   theme_minimal()  +
   
   theme(
@@ -116,11 +117,11 @@ plot_challenge_2 <-
                               margin=margin(5,0,0,0)),
     plot.margin = margin(t = 1, r = 4, b = 3, l = 8, "cm"),
     legend.background = element_rect(fill = palette["paper"],color = palette["paper"]),
-    legend.key  = element_rect(margin = margin(r = 150, unit = "pt"),
-                               fill = palette["paper"],color = palette["paper"]),
+    legend.key  = element_rect(fill = palette["paper"],color = palette["paper"]),
     legend.position = "top",
     legend.direction = "vertical",
-    legend.text = element_text(margin = margin(r = 150, unit = "pt"),hjust = 1,size = 12),
+    legend.text = element_text(margin = margin(r = 15, unit = "pt"),size = 12),
+    legend.spacing.x = unit(1.0, "cm"),
     strip.background = element_rect(fill = palette["paper"],colour = palette["paper"]),
     strip.text.y.left = element_text(angle = 0,margin = margin(r = 150,l = 100),size = 14)
   )
@@ -130,9 +131,9 @@ plot_challenge_2 <-
 # Anotations --------------------------------------------------------------
 
 plot_challenge_2 <- ggdraw(plot = plot_challenge_2) +
-  draw_text(text = "{",x = 0.23,y = 0.24,size = 140,family = "almendra") +
-  draw_text(text = "{",x = 0.23,y = 0.51,size = 140,family = "almendra") +
-  draw_text(text = "{",x = 0.23,y = 0.78,size = 140,family = "almendra")
+  draw_text(text = "{",x = 0.25,y = 0.23,size = 130,family = "almendra") +
+  draw_text(text = "{",x = 0.25,y = 0.50,size = 130,family = "almendra") +
+  draw_text(text = "{",x = 0.25,y = 0.77,size = 130,family = "almendra")
 
 
   # Printing the plot: ------------------------------------------------------
