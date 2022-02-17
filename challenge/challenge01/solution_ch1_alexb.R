@@ -44,14 +44,19 @@ font_add_google(name = "Cormorant Garamond", family = "corgar")
 showtext_auto()
 
 
-# Graphic: ----------------------------------------------------------------
 
-plot_challenge_1 <-
+# Preprocessing -----------------------------------------------------------
+
+data_db <-
   data_db %>% 
   pivot_longer(cols = 2:3,
                names_to = "population",
                values_to = "number") %>%
-  mutate(population = str_to_upper(population)) %>% 
+  mutate(population = str_to_upper(population)) 
+
+# Graphic: ----------------------------------------------------------------
+
+plot_challenge_1 <- data_db %>% 
   ggplot(aes(x = Year, y = number,group = population)) + 
   geom_line(aes(linetype = population),show.legend = T) + 
   geom_brace(aes(y=c(0,100), x=c(1788,1784)), inherit.data=F, rotate=270) +
