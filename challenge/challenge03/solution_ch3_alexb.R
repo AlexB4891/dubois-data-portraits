@@ -31,7 +31,7 @@ palette <- c(
 
 # Data, after making a clone of the forked repository:
 
-data_db <- read_csv("challenge/challenge02/data.csv")
+data_db <- read_csv("challenge/challenge03/data.csv")
 
 # Fonts
 
@@ -42,4 +42,25 @@ font_add_google(name = "Almendra Display", family = "almendra")
 
 showtext_auto()
 
+
+# Reescalando la base para generar los "abanicos" -------------------------
+
+
+auxiliar <- distinct(data_db,Group) %>% 
+  mutate(Percentage = 70,
+         Occupation = "Invisible")
+
+fct_level <- data_db %>% pull(Occupation) %>% unique
+
+data_db <- data_db %>% 
+  mutate(
+    value = Percentage,
+    Percentage = 0.3*Percentage,
+    label = percent(value/100)
+  ) %>% 
+  bind_rows(auxiliar) %>% 
+  mutate(Occupation = factor(Occupation,
+                             levels = c(fct_level,"Invisible")),
+         transparency = if_else(Occupation == "Invisible",1,0),
+         size_text = if_else(value < 20,1,0))
 
