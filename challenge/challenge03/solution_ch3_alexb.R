@@ -60,7 +60,29 @@ data_db <- data_db %>%
   ) %>% 
   bind_rows(auxiliar) %>% 
   mutate(Occupation = factor(Occupation,
-                             levels = c(fct_level,"Invisible")),
+                             levels = c("Invisible",fct_level)),
          transparency = if_else(Occupation == "Invisible",1,0),
          size_text = if_else(value < 20,1,0))
 
+data_db <- data_db %>%
+  group_by(Group) %>% 
+  arrange(Group,desc(Occupation)) %>% 
+  mutate(ypos = cumsum(Percentage)-0.5*Percentage)
+
+
+plot_list <- map2(.x = data_db %>% 
+       split(.$Group),
+     .y = list(
+       c(0,0,-325,0),
+       c(-325,0,0,0)
+     ),
+     .f = ~{
+       
+       ggplot(data = .x,mapping = aes(x = "",y = Percentage,fill = Occupation)) +
+         geom_bar(stat = "identity") + 
+         geom_text(aes(y = ypos,label = label))
+     } 
+  ) 
+
+
+cowplot::plot_grid(plotlist = plot_list)
