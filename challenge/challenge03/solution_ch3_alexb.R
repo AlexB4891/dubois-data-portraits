@@ -12,6 +12,9 @@ library(scales)
 library(extrafont)
 library(showtext)
 library(cowplot)
+library(magick)
+library(grid)
+library(gridExtra) 
 
 # Inputs: -----------------------------------------------------------------
 
@@ -28,6 +31,14 @@ palette <- c(
   blue = "#4682b4",
   paper = "#f7e6c6"
 )
+
+
+colores_pie <- c('Invisible' = unname(palette["paper"]),
+                 'Agriculture, Fisheries and Mining' = unname(palette["red"]),
+                 'Manufacturing and Mechanical Industries' = unname(palette["blue"]),
+                 'Domestic and Personal Service' = unname(palette["gold"]),
+                 'Professions' = unname(palette["brown"]),
+                 'Trade and Transportation' = unname(palette["paper"]))
 
 # Data, after making a clone of the forked repository:
 
@@ -61,8 +72,8 @@ data_db <- data_db %>%
   bind_rows(auxiliar) %>% 
   mutate(Occupation = factor(Occupation,
                              levels = c("Invisible",fct_level)),
-         transparency = if_else(Occupation == "Invisible",1,0),
-         size_text = if_else(value < 20,1,0))
+         transparency = if_else(Occupation == "Invisible",0,1),
+         size_text = if_else(value < 12,0,1))
 
 data_db <- data_db %>%
   group_by(Group) %>% 
@@ -71,18 +82,130 @@ data_db <- data_db %>%
 
 
 plot_list <- map2(.x = data_db %>% 
-       split(.$Group),
-     .y = list(
-       c(0,0,-325,0),
-       c(-325,0,0,0)
-     ),
+                    split(.$Group),
+                  .y = c(2*pi*0.85,2*pi*0.35),
      .f = ~{
        
-       ggplot(data = .x,mapping = aes(x = "",y = Percentage,fill = Occupation)) +
+       ggplot(data = .x,mapping = aes(x = "",
+                                      y = Percentage,
+                                      fill = Occupation,
+                                      alpha = transparency)) +
          geom_bar(stat = "identity") + 
-         geom_text(aes(y = ypos,label = label))
+         geom_text(aes(y = ypos,label = label,size = size_text),nudge_x = 0.3) +
+         coord_polar(theta = "y",start = .y)+
+         scale_fill_manual(values = colores_pie)+
+         scale_size(range = c(2,5))
      } 
   ) 
 
 
-cowplot::plot_grid(plotlist = plot_list)
+plot_list <- map(.x = plot_list,
+     .f = ~{
+       
+       .x + 
+         theme(
+           panel.background=element_blank(), 
+           panel.grid.major=element_blank(), 
+           panel.grid.minor=element_blank(), 
+           panel.spacing = unit(c(0, 0, 0, 0), "cm"),       
+           axis.ticks=element_blank(), 
+           axis.text.x=element_blank(), 
+           axis.text.y=element_blank(), 
+           axis.title.x=element_blank(), 
+           axis.title.y=element_blank(),
+           plot.background = element_rect(fill = "transparent",colour = NA),
+           plot.margin = unit(c(0,0,0,0), "cm"),  # Edited code
+           legend.position = 'none')
+     } 
+) 
+
+walk2(.x = plot_list,
+      .y = c("challenge/challenge03/parte_1.png",
+             "challenge/challenge03/parte_2.png"),
+     .f = ~{
+       
+       name <- .y
+       
+      plot <- .x
+       
+       png(filename = name,res = 250)
+       
+       print(plot)
+       
+       dev.off()
+       
+     })
+
+
+walk2(.x = c("parte_1","parte_2"),
+     .y = c("350x240+70","350x240+70+240"),
+     ~{
+
+       imagen <- image_read(path = str_c("challenge/challenge03/",.x,".png"))
+       
+       imagen <-
+         image_crop(image = imagen,geometry = .y)
+       
+       image_write(image = imagen,path = str_c("challenge/challenge03/",.x,"_crop.png"))
+       
+              
+     })
+
+
+
+plots <- c("parte_1","parte_2") %>% 
+  map(~str_c("challenge/challenge03/",.x,"_crop.png")) %>% 
+  map(image_read)
+
+
+legend_1 <- tibble(leg = c(
+  'Agriculture, Fisheries \nand Mining' ,
+  'Manufacturing and \nMechanical Industries' ))
+  
+legend_2 <- tibble(leg = c(
+  'Domestic and \nPersonal Service' ,
+  'Professions' ,
+  'Trade and \nTransportation' ))
+
+
+legends <- map2(.x = list(legend_1,legend_2),
+     .y = list(c('Agriculture, Fisheries \nand Mining' = unname(palette["red"]),
+                           'Manufacturing and \nMechanical Industries' = unname(palette["blue"])),
+               c('Domestic and \nPersonal Service' = unname(palette["gold"]) %>% str_to_upper(),
+                           'Professions' = unname(palette["brown"]),
+                           'Trade and \nTransportation' = unname(palette["paper"]) %>% str_to_upper())),
+    .f = ~{ 
+      
+      colores <- .y
+      
+      names(colores) <- str_to_upper(names(colores))
+
+      plot <- .x %>% 
+        mutate(value = 1,
+               leg = str_to_upper(leg)) %>% 
+        ggplot(aes(x = 1,y = value,color = leg,fill = leg)) + 
+        geom_point() +
+        guides(color = guide_legend(override.aes=list(shape = 21,size = 12),
+                                   ncol=1)) +
+        scale_fill_manual(values = colores) +
+        scale_color_manual(values = colores) +
+        theme(text = element_text(family = "space"),
+              legend.title = element_blank(),
+              legend.text.align = 0.5,
+              legend.spacing.x = unit(0.5, 'cm'),
+              legend.text = element_text(margin = margin(t = 20),vjust = 2))
+      
+      
+      legend <- cowplot::get_legend(plot)
+      
+      return(legend)
+      })
+
+
+plot_grid(legends[[1]],legends[[2]])
+
+ggdraw() +
+  draw_image(image = "challenge/challenge03/parte_1_crop.png",x = 0,y = 0.2,scale = 0.4)+
+  draw_image(image = "challenge/challenge03/parte_2_crop.png",x = 0,y = -0.2,scale = 0.4)
+
+
