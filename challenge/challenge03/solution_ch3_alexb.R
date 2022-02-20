@@ -167,45 +167,69 @@ legend_2 <- tibble(leg = c(
   'Professions' ,
   'Trade and \nTransportation' ))
 
+sides <- c("left","right")
 
-legends <- map2(.x = list(legend_1,legend_2),
-     .y = list(c('Agriculture, Fisheries \nand Mining' = unname(palette["red"]),
-                           'Manufacturing and \nMechanical Industries' = unname(palette["blue"])),
-               c('Domestic and \nPersonal Service' = unname(palette["gold"]) %>% str_to_upper(),
-                           'Professions' = unname(palette["brown"]),
-                           'Trade and \nTransportation' = unname(palette["paper"]) %>% str_to_upper())),
-    .f = ~{ 
-      
-      colores <- .y
-      
-      names(colores) <- str_to_upper(names(colores))
+legends <- pmap(
+  .l = list(leyenda = list(legend_1,legend_2),
+            colores = list(c('Agriculture, Fisheries \nand Mining' = unname(palette["red"]),
+                             'Manufacturing and \nMechanical Industries' = unname(palette["blue"])),
+                           c('Domestic and \nPersonal Service' = unname(palette["gold"]) %>% str_to_upper(),
+                             'Professions' = unname(palette["brown"]),
+                             'Trade and \nTransportation' = unname(palette["paper"]) %>% str_to_upper())),
+            posicion = c(2,1)),
+  .f = function(leyenda,colores,posicion)  { 
+    
+    # colores <- .y
+    
+    names(colores) <- str_to_upper(names(colores))
 
-      plot <- .x %>% 
-        mutate(value = 1,
-               leg = str_to_upper(leg)) %>% 
-        ggplot(aes(x = 1,y = value,color = leg,fill = leg)) + 
-        geom_point() +
-        guides(color = guide_legend(override.aes=list(shape = 21,size = 12),
-                                   ncol=1)) +
-        scale_fill_manual(values = colores) +
-        scale_color_manual(values = colores) +
-        theme(text = element_text(family = "space"),
-              legend.title = element_blank(),
-              legend.text.align = 0.5,
-              legend.spacing.x = unit(0.5, 'cm'),
-              legend.text = element_text(margin = margin(t = 20),vjust = 2))
-      
-      
-      legend <- cowplot::get_legend(plot)
-      
-      return(legend)
-      })
+    # 
+    # browser()   
+    # 
+    plot <- leyenda %>% 
+      mutate(value = 1,
+             leg = str_to_upper(leg)) %>% 
+      ggplot(aes(x = 1,y = value,color = leg,fill = leg)) + 
+      geom_point() +
+      scale_fill_manual(values = colores) +
+      scale_color_manual(values = colores) +
+      theme(text = element_text(family = "space"),
+            legend.title = element_blank(),
+            legend.text.align = 0.5,
+            legend.spacing.x = unit(0.5, 'cm'),
+            # legend.position = "right",
+            legend.text = element_text(margin = margin(t = 20),vjust = 2)) 
+    
+    plot <- plot+
+      guides(fill = guide_legend(label.position = sides[posicion],
+                                  override.aes=list(shape = 21,size = 12),
+                                  ncol=1)) 
+    
+    
+    legend <- cowplot::get_legend(plot)
+    
+    return(legend)
+  })
 
 
+
+plot(legends[[2]])
 plot_grid(legends[[1]],legends[[2]])
 
-ggdraw() +
-  draw_image(image = "challenge/challenge03/parte_1_crop.png",x = 0,y = 0.2,scale = 0.4)+
-  draw_image(image = "challenge/challenge03/parte_2_crop.png",x = 0,y = -0.2,scale = 0.4)
+plot <- ggdraw() +
+  draw_image(image = "challenge/challenge03/parte_1_crop.png",x = 0,y = 0.2,scale = 0.74)+
+  draw_image(image = "challenge/challenge03/parte_2_crop.png",x = 0,y = -0.2,scale = 0.74)+ 
+  draw_plot(legends[[1]],x = -0.3,scale = 2)+
+  draw_plot(legends[[2]],x = 0.3,scale = 2) +
+  draw_text(text = "WHITES",x = 0.5,y = 0.16,family = "space")+
+  draw_text(text = "NEGROES",x = 0.5,y = 0.84,family = "space")+
+  draw_text(text = str_to_upper("Occupation of negroes and whites in Georgia"),
+            x = 0.5,y = 0.95,family = "space")
 
+
+png("challenge/challenge03/sol.png",width = 800,height = 1025,units = "px")
+
+plot
+
+dev.off()
 
