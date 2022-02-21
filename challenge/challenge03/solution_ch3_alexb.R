@@ -73,7 +73,9 @@ data_db <- data_db %>%
   mutate(Occupation = factor(Occupation,
                              levels = c("Invisible",fct_level)),
          transparency = if_else(Occupation == "Invisible",0,1),
-         size_text = if_else(value < 12,0,1))
+         size_text = if_else(value < 12,0,1),
+         color_line = if_else(Occupation == "Invisible",0,1),
+         color_line = factor(color_line))
 
 data_db <- data_db %>%
   group_by(Group) %>% 
@@ -89,12 +91,14 @@ plot_list <- map2(.x = data_db %>%
        ggplot(data = .x,mapping = aes(x = "",
                                       y = Percentage,
                                       fill = Occupation,
-                                      alpha = transparency)) +
+                                      alpha = transparency,
+                                      color = color_line)) +
          geom_bar(stat = "identity") + 
          geom_text(aes(y = ypos,label = label,size = size_text),nudge_x = 0.3) +
-         coord_polar(theta = "y",start = .y)+
+         coord_polar(theta = "y",start = .y,direction = -1)+
          scale_fill_manual(values = colores_pie)+
-         scale_size(range = c(2,5))
+         scale_size(range = c(5,10)) + 
+         scale_color_manual(values = c(palette["paper"],"black"))
      } 
   ) 
 
@@ -113,7 +117,7 @@ plot_list <- map(.x = plot_list,
            axis.text.y=element_blank(), 
            axis.title.x=element_blank(), 
            axis.title.y=element_blank(),
-           plot.background = element_rect(fill = "transparent",colour = NA),
+           plot.background = element_rect(fill = palette[["paper"]],colour = NA),
            plot.margin = unit(c(0,0,0,0), "cm"),  # Edited code
            legend.position = 'none')
      } 
@@ -126,22 +130,20 @@ walk2(.x = plot_list,
        
        name <- .y
        
-      plot <- .x
+       plot <- .x
        
-       png(filename = name,res = 250)
-       
-       print(plot)
-       
-       dev.off()
+     ggsave(filename = name,plot = plot,dpi = 250)
        
      })
 
 
 walk2(.x = c("parte_1","parte_2"),
-     .y = c("350x240+70","350x240+70+240"),
+     .y = c("905x554+560+139","905x554+560+698"),
      ~{
 
        imagen <- image_read(path = str_c("challenge/challenge03/",.x,".png"))
+       
+       # browser()
        
        imagen <-
          image_crop(image = imagen,geometry = .y)
@@ -189,15 +191,17 @@ legends <- pmap(
     plot <- leyenda %>% 
       mutate(value = 1,
              leg = str_to_upper(leg)) %>% 
-      ggplot(aes(x = 1,y = value,color = leg,fill = leg)) + 
-      geom_point() +
+      ggplot(aes(x = 1,y = value,fill = leg)) + 
+      geom_point(color = "black") +
       scale_fill_manual(values = colores) +
-      scale_color_manual(values = colores) +
+      # scale_color_manual(values = colores) +
       theme(text = element_text(family = "space"),
             legend.title = element_blank(),
             legend.text.align = 0.5,
-            legend.spacing.x = unit(0.5, 'cm'),
+            legend.spacing.x = unit(1, 'cm'),
             # legend.position = "right",
+            legend.background = element_rect(fill = palette["paper"],color = palette["paper"]),
+            legend.key  = element_rect(fill = palette["paper"],color = palette["paper"]),
             legend.text = element_text(margin = margin(t = 20),vjust = 2)) 
     
     plot <- plot+
@@ -217,17 +221,24 @@ plot(legends[[2]])
 plot_grid(legends[[1]],legends[[2]])
 
 plot <- ggdraw() +
-  draw_image(image = "challenge/challenge03/parte_1_crop.png",x = 0,y = 0.2,scale = 0.74)+
-  draw_image(image = "challenge/challenge03/parte_2_crop.png",x = 0,y = -0.2,scale = 0.74)+ 
-  draw_plot(legends[[1]],x = -0.3,scale = 2)+
-  draw_plot(legends[[2]],x = 0.3,scale = 2) +
-  draw_text(text = "WHITES",x = 0.5,y = 0.16,family = "space")+
-  draw_text(text = "NEGROES",x = 0.5,y = 0.84,family = "space")+
+  theme(plot.background = element_rect(fill=palette["paper"], color = NA)) +
+  draw_image(image = "challenge/challenge03/parte_1_crop.png",x = 0,y = 0.2,scale = 0.815)+
+  draw_image(image = "challenge/challenge03/parte_2_crop.png",x = 0,y = -0.2,scale = 0.815)+ 
+  draw_plot(legends[[1]],x = -0.35,scale = 2)+
+  draw_plot(legends[[2]],x = 0.35,scale = 2) +
+  draw_text(text = "WHITES",x = 0.5,y = 0.08,family = "space")+
+  draw_text(text = "NEGROES",x = 0.5,y = 0.91,family = "space")+
   draw_text(text = str_to_upper("Occupation of negroes and whites in Georgia"),
-            x = 0.5,y = 0.95,family = "space")
+            x = 0.5,y = 0.95,family = "space",fontface = "bold",size = 20) +
+  draw_line(x = c(0.093,0.905),
+            y = c(0.264,0.735))  
 
+plot <- add_sub(plot = plot,label = "Elaborado por: Alex Bajaña | twitter: @AlexBajaa5 | Github: https://github.com/AlexB4891",
+                size = 8)
 
-png("challenge/challenge03/sol.png",width = 800,height = 1025,units = "px")
+plot <- ggdraw(plot)
+
+png("challenge/challenge03/solution_ch3_alexb.png",width = 800,height = 1025,units = "px")
 
 plot
 
